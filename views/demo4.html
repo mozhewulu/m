@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <script type="text/javascript" src="javascript/three.js"></script>
+    <script type="text/javascript" src="/javascript/stat.js"></script>
+
+    <script type="text/javascript">
+      var stat = null;
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+
+      var cube = null;
+      var alpha = 0;
+
+      function init() {
+        stat = new Stats();
+        stat.domElement.style.position = 'absolute';
+        stat.domElement.style.right = '0px';
+        stat.domElement.style.top = '0px';
+        document.body.appendChild(stat.domElement);
+
+        renderer = new THREE.WebGLRenderer({
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        scene = new THREE.Scene();
+
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(5, 15, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+
+        // var light = new THREE.AmbientLight(0xffffff)
+        // scene.add(light)
+
+        // var light = new THREE.PointLight(0xffffff,1.5,100);
+        // light.position.set(0, 1.5, 2)
+        // scene.add(light);
+
+        // var light = new THREE.DirectionalLight(0xffff00,1.5);
+        // light.position.set(2, 5, 3);
+        // scene.add(light);
+
+        // var greenCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
+        //   new THREE.MeshLambertMaterial({color: 0x00ff00}));
+        // greenCube.position.x = 3;
+        // scene.add(greenCube);
+        //
+        // var whiteCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
+        //   new THREE.MeshLambertMaterial({color: 0xffffff}));
+        // whiteCube.position.x = -3;
+        // scene.add(whiteCube);
+
+
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(8, 8, 16, 16),
+          new THREE.MeshLambertMaterial({color: 0xcccccc}));
+        plane.rotation.x = -Math.PI / 2;
+        plane.position.y = -1;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        cube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1),
+          new THREE.MeshLambertMaterial({color:0x00ff00}))
+        cube.position.x = 2;
+        cube.castShadow = true;
+        scene.add(cube)
+
+        var light = new THREE.SpotLight(0xffff00, 1, 100, Math.PI/6, 25);
+        light.position.set(2,5,3);
+        light.target = cube;
+        light.castShadow = true;
+        //
+        // light.shadow.camera.near = 1;
+        // light.shadow.camera.far = 100;
+        // light.shadow.camera.fov = 30;
+        //
+        // light.shadow.mapSize.width = 1024;
+        // light.shadow.mapSize.height = 1024;
+
+        scene.add(light)
+
+        // var helper = new THREE.SpotLightHelper( light  );
+        // scene.add( helper );
+        var ambient = new THREE.AmbientLight(0x666666);
+        scene.add(ambient);
+
+        // renderer.render(scene, camera);
+        requestAnimationFrame(draw)
+      }
+      function draw(){
+        stat.begin()
+
+        alpha += 0.01
+        if(alpha > Math.PI * 2){
+          alpha -= Math.PI * 2
+        }
+
+        cube.position.set(2 * Math.cos(alpha), 0, 2 * Math.sin(alpha));
+
+        renderer.render(scene, camera);
+
+        requestAnimationFrame(draw)
+
+        stat.end()
+      }
+    </script>
+  </head>
+
+  <body onload="init()">
+    <canvas id="mainCanvas" width="800px" height="600px" ></canvas>
+  </body>
+</html>
